@@ -15,19 +15,26 @@ function LoginForm({ onSubmit, buttonText }) {
 
   const handleSubmit = e => {
     e.preventDefault()
-    onSubmit({ userName, password })
+    const { username, password } = e.target.elements
+
+    onSubmit({
+      username: username.value,
+      password: password.value,
+    })
   }
 
   return (
-    <div>
+    <form onSubmit={handleSubmit}>
       <div>
-        <input type='text' value={userName} onChange={handleUsrChange} />
+        <label htmlFor='username'>Username</label>
+        <input id='username' type='text' value={userName} onChange={handleUsrChange} />
       </div>
       <div>
-        <input type='text' value={password} onChange={handlePswChange} />
+        <label htmlFor='password'>Password</label>
+        <input id='password' type='password' value={password} onChange={handlePswChange} />
       </div>
-      <button onClick={handleSubmit}>{buttonText}</button>
-    </div>
+      <button type='submit'>{buttonText}</button>
+    </form>
   )
 }
 
@@ -37,7 +44,7 @@ function App() {
     console.log('login', formData)
   }
   const handleRegisterSubmit = (formData) => {
-    console.log('login', formData)
+    console.log('register', formData)
   }
 
   return (
