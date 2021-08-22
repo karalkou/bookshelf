@@ -7,36 +7,22 @@ import { FaSearch, FaTimes } from 'react-icons/fa'
 import { Input, BookListUL, Spinner } from './components/lib'
 import { BookRow } from './components/book-row'
 import { client } from './utils/api-client'
+import { useAsync } from './utils/hooks'
+
 import * as React from 'react'
 import * as colors from './styles/colors'
 
 function DiscoverBooksScreen() {
-  const [status, setStatus] = React.useState('idle')
-  const [data, setData] = React.useState(null)
-  const [error, setError] = React.useState()
-  const [query, setQuery] = React.useState('')
-  // user has submitted the form, so you'll need a boolean for that as well
+  const { data, error, run, isLoading, isError, isSuccess } = useAsync()
+  const [query, setQuery] = React.useState()
   const [queried, setQueried] = React.useState(false)
 
   React.useEffect(() => {
     if (!queried) {
       return
     }
-    setStatus('loading')
-    client(`books?query=${encodeURIComponent(query)}`)
-      .then(responseData => {
-          setData(responseData)
-          setStatus('success')
-        },
-        errorData => {
-          setError(errorData)
-          setStatus('error')
-        })
-  }, [query, queried])
-
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
-  const isError = status === 'error'
+    run(client(`books?query=${encodeURIComponent(query)}`))
+  }, [query, queried, run])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
