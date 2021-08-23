@@ -1,30 +1,77 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import { jsx } from '@emotion/core'
 
 import * as React from 'react'
-// 🐨 you're going to need this:
-// import * as auth from 'auth-provider'
-import {AuthenticatedApp} from './authenticated-app'
-import {UnauthenticatedApp} from './unauthenticated-app'
+import * as auth from 'auth-provider'
+import { AuthenticatedApp } from './authenticated-app'
+import { UnauthenticatedApp } from './unauthenticated-app'
+import { client } from './utils/api-client'
+import { useAsync } from './utils/hooks'
+import { FullPageSpinner } from './components/lib'
 
-function App() {
-  // 🐨 useState for the user
+import * as colors from './styles/colors'
 
-  // 🐨 create a login function that calls auth.login then sets the user
-  // 💰 const login = form => auth.login(form).then(u => setUser(u))
-  // 🐨 create a registration function that does the same as login except for register
+async function getUser() {
+  let user = null
+  const token = await auth.getToken()
 
-  // 🐨 create a logout function that calls auth.logout() and sets the user to null
+  if (token) {
+    const data = await client('me', { token })
+    user = data.user
+  }
 
-  // 🐨 if there's a user, then render the AuthenticatedApp with the user and logout
-  // 🐨 if there's not a user, then render the UnauthenticatedApp with login and register
-
-  return <UnauthenticatedApp />
+  return user
 }
 
-export {App}
+function App() {
+  const {
+    data: user,
+    setData,
+    run,
+    error,
+    isLoading,
+    isIdle,
+    isError,
+    isSuccess,
+  } = useAsync()
 
-/*
-eslint
-  no-unused-vars: "off",
-*/
+  React.useEffect(() => {
+    run(getUser())
+  }, [run])
+
+  const login = form => auth.login(form).then(user => setData(user))
+  const register = form => auth.register(form).then(user => setData(user))
+  const logout = () => {
+    auth.logout()
+    setData(null)
+  }
+
+  return <>
+    {(isLoading || isIdle) && <FullPageSpinner />}
+    {isError && (
+      <div
+        css={{
+          color: colors.danger,
+          height: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <p>Uh oh... There's a problem. Try refreshing the app.</p>
+        <pre>{error.message}</pre>
+      </div>
+    )}
+    {
+      isSuccess && (
+        user ?
+          <AuthenticatedApp user={user} logout={logout} />
+          :
+          <UnauthenticatedApp login={login} register={register} />
+      )
+    }
+  </>
+}
+
+export { App }
