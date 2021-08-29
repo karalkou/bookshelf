@@ -55,14 +55,14 @@ function StatusButtons({ user, book }) {
       .then(data => data.listItems),
   })
 
+  const listItem = listItems?.find(li => li.bookId === book.id) || null
+
   const [create] = useMutation(
     ({ bookId }) => client('list-items', { data: { bookId }, token: user.token }),
     {
       onSettled: () => queryCache.invalidateQueries('list-items'),
     },
   )
-
-  const listItem = listItems?.find(li => li.bookId === book.id) || null
 
   const [update] = useMutation(
     updates =>
