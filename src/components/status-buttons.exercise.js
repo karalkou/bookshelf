@@ -10,7 +10,7 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import { /* useQuery, */ useMutation /*, queryCache */ } from 'react-query'
+import { useQuery, useMutation, queryCache } from 'react-query'
 import { client } from 'utils/api-client'
 import { useAsync } from 'utils/hooks'
 import { CircleButton, Spinner } from './lib'
@@ -49,17 +49,20 @@ function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
 }
 
 function StatusButtons({ user, book }) {
-  // 🐨 call useQuery here to get the listItem (if it exists)
-  // queryKey should be 'list-items'
-  // queryFn should call the list-items endpoint
+  const { data: listItems } = useQuery({
+    queryKey: 'list-items',
+    queryFn: () => client('list-items', { token: user.token })
+      .then(data => data.listItems),
+  })
 
   const [create] = useMutation(
     ({ bookId }) => client('list-items', { data: { bookId }, token: user.token }),
+    {
+      onSettled: () => queryCache.invalidateQueries('list-items')
+    }
   )
 
-  // 🐨 search through the listItems you got from react-query and find the
-  // one with the right bookId.
-  const listItem = null
+  const listItem = listItems?.find(li => li.bookId === book.id) || null
 
   // 💰 for all the mutations below, if you want to get the list-items cache
   // updated after this query finishes the use the `onSettled` config option
