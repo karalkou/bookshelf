@@ -12,6 +12,7 @@ import {
 import Tooltip from '@reach/tooltip'
 import { useQuery, useMutation, queryCache } from 'react-query'
 import { client } from 'utils/api-client'
+import { useListItem } from 'utils/list-items'
 import { useAsync } from 'utils/hooks'
 import { CircleButton, Spinner } from './lib'
 
@@ -49,13 +50,7 @@ function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
 }
 
 function StatusButtons({ user, book }) {
-  const { data: listItems } = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client('list-items', { token: user.token })
-      .then(data => data.listItems),
-  })
-
-  const listItem = listItems?.find(li => li.bookId === book.id) || null
+  const listItem = useListItem(user, book.id)
 
   const [create] = useMutation(
     ({ bookId }) => client('list-items', { data: { bookId }, token: user.token }),
