@@ -10,8 +10,7 @@ import {
   FaTimesCircle,
 } from 'react-icons/fa'
 import Tooltip from '@reach/tooltip'
-import { useQuery, useMutation, queryCache } from 'react-query'
-import { client } from 'utils/api-client'
+import { useUpdateListItem, useRemoveListItem, useCreateListItem } from 'utils/list-items'
 import { useListItem } from 'utils/list-items'
 import { useAsync } from 'utils/hooks'
 import { CircleButton, Spinner } from './lib'
@@ -52,31 +51,11 @@ function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
 function StatusButtons({ user, book }) {
   const listItem = useListItem(user, book.id)
 
-  const [create] = useMutation(
-    ({ bookId }) => client('list-items', { data: { bookId }, token: user.token }),
-    {
-      onSettled: () => queryCache.invalidateQueries('list-items'),
-    },
-  )
+  const [create] = useCreateListItem(user)
 
-  const [update] = useMutation(
-    updates =>
-      client(`list-items/${updates.id}`, {
-        method: 'PUT',
-        data: updates,
-        token: user.token,
-      }),
-    {
-      onSettled: () => queryCache.invalidateQueries('list-items'),
-    },
-  )
+  const [update] = useUpdateListItem(user)
 
-  const [remove] = useMutation(
-    ({ id }) => client(`list-items/${id}`, { method: 'DELETE', token: user.token }),
-    {
-      onSettled: () => queryCache.invalidateQueries('list-items'),
-    },
-  )
+  const [remove] = useRemoveListItem(user)
 
   return (
     <React.Fragment>
