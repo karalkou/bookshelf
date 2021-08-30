@@ -13,25 +13,12 @@ import * as colors from 'styles/colors'
 import { Textarea } from 'components/lib'
 import { Rating } from 'components/rating'
 import { StatusButtons } from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
+import { useBook } from 'utils/books'
 import { queryCache, useMutation, useQuery } from 'react-query'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
 
 function BookScreen({ user }) {
   const { bookId } = useParams()
-  const { data: book = loadingBook } = useQuery({
-    queryKey: ['book', { bookId }],
-    queryFn: () => client(`books/${bookId}`, { token: user.token })
-      .then(data => data.book),
-  })
+  const book = useBook(bookId, user)
 
   const { data: listItems } = useQuery({
     queryKey: 'list-items',
