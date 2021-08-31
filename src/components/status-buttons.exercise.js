@@ -18,10 +18,14 @@ import { CircleButton, Spinner } from './lib'
 import * as colors from 'styles/colors'
 
 function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
-  const { isLoading, isError, error, run } = useAsync()
+  const { isLoading, isError, error, run, reset } = useAsync()
 
   function handleClick() {
-    run(onClick())
+    if (isError) {
+      reset()
+    } else {
+      run(onClick())
+    }
   }
 
   return (
@@ -51,11 +55,11 @@ function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
 function StatusButtons({ user, book }) {
   const listItem = useListItem(user, book.id)
 
-  const [create] = useCreateListItem(user)
+  const [create] = useCreateListItem(user, { throwOnError: true })
 
-  const [update] = useUpdateListItem(user)
+  const [update] = useUpdateListItem(user, { throwOnError: true })
 
-  const [remove] = useRemoveListItem(user)
+  const [remove] = useRemoveListItem(user, { throwOnError: true })
 
   return (
     <React.Fragment>
