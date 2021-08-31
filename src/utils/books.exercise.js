@@ -11,12 +11,24 @@ const loadingBook = {
   loadingBook: true,
 }
 
+const loadingBooks = Array.from({length: 10}, (v, index) => ({
+  id: `loading-book-${index}`,
+  ...loadingBook,
+}))
+
 const getBookSearchConfig = (query, user) => ({
   queryKey: ['bookSearch', { query }],
   queryFn: () =>
     client(`books?query=${encodeURIComponent(query)}`, {
       token: user.token,
     }).then(data => data.books),
+  config: {
+    onSuccess(books) {
+      for (const book of books) {
+        setQueryDataForBook(book)
+      }
+    },
+  },
 })
 
 function useBookSearch(query, user) {
@@ -38,4 +50,8 @@ async function refetchBookSearchQuery(user) {
   await queryCache.prefetchQuery(getBookSearchConfig('', user))
 }
 
-export { useBook, useBookSearch, refetchBookSearchQuery }
+function setQueryDataForBook(book) {
+  queryCache.setQueryData(['book', { bookId: book.id }], book)
+}
+
+export { useBook, useBookSearch, refetchBookSearchQuery, setQueryDataForBook }
