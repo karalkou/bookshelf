@@ -3,7 +3,7 @@ import { jsx } from '@emotion/core'
 
 import * as React from 'react'
 import Tooltip from '@reach/tooltip'
-import { useBookSearch } from 'utils/books'
+import { useBookSearch, refetchBookSearchQuery } from 'utils/books'
 import { BookRow } from 'components/book-row'
 import { BookListUL, Spinner, Input } from 'components/lib'
 
@@ -21,6 +21,10 @@ function DiscoverBooksScreen({ user }) {
     isError,
     isSuccess,
   } = useBookSearch(query, user)
+
+  React.useEffect(() => {
+    return () => refetchBookSearchQuery(user)
+  }, [user])
 
   function handleSearchSubmit(event) {
     event.preventDefault()
