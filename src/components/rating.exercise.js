@@ -2,7 +2,7 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
-import {AuthContext} from 'context/auth-context'
+import {useAuth} from 'context/auth-context'
 import {useUpdateListItem} from 'utils/list-items'
 import {ErrorMessage} from 'components/lib'
 import {FaStar} from 'react-icons/fa'
@@ -21,7 +21,7 @@ const visuallyHiddenCSS = {
 
 function Rating({listItem}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  const {user} = React.useContext(AuthContext)
+  const {user} = useAuth()
   const [update, {error, isError}] = useUpdateListItem(user)
 
   React.useEffect(() => {
