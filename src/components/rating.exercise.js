@@ -2,10 +2,11 @@
 import {jsx} from '@emotion/core'
 
 import * as React from 'react'
+import {useAuth} from 'context/auth-context'
 import {useUpdateListItem} from 'utils/list-items'
+import {ErrorMessage} from 'components/lib'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
-import {ErrorMessage} from 'components/lib'
 
 const visuallyHiddenCSS = {
   border: '0',
@@ -17,10 +18,10 @@ const visuallyHiddenCSS = {
   position: 'absolute',
   width: '1px',
 }
-// 💣 remove the user prop
-function Rating({listItem, user}) {
+
+function Rating({listItem}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  // 💣 we no longer need to pass the user here:
+  const {user} = useAuth()
   const [update, {error, isError}] = useUpdateListItem(user)
 
   React.useEffect(() => {
